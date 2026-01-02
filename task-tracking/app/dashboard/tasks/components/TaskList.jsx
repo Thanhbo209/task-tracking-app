@@ -4,10 +4,14 @@ import { useEffect, useState } from "react";
 import TaskItem from "./TaskItem";
 import FilterTask from "./FilterTask";
 import { apiFetch } from "@/lib/api";
+import { useLanguage } from "@/context/LanguageContext";
+import { translations } from "@/lib/i18n";
 
 export default function TaskList({ onEdit, reload }) {
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { lang } = useLanguage();
+  const t = translations[lang].tasks;
   const [filters, setFilters] = useState({
     status: "all",
     deadline: "all",
@@ -63,8 +67,8 @@ export default function TaskList({ onEdit, reload }) {
     return acc;
   }, {});
 
-  if (loading) return <p>Loading tasks...</p>;
-  if (!tasks.length) return <p>No tasks found</p>;
+  if (loading) return <p>{t.loading}</p>;
+  if (!tasks.length) return <p>{t.noTasksFound}</p>;
 
   return (
     <div>
@@ -85,13 +89,7 @@ export default function TaskList({ onEdit, reload }) {
                 index !== 0 ? "border-l border-(--border) pl-4 " : ""
               }`}
             >
-              <h3 className="text-lg font-semibold capitalize">
-                {status === "todo"
-                  ? "To Do"
-                  : status === "doing"
-                  ? "In Progress"
-                  : "Done"}
-              </h3>
+              <h3 className="text-lg font-semibold">{t.status[status]}</h3>
 
               {tasksByStatus[status].length > 0 ? (
                 tasksByStatus[status].map((task) => (
@@ -109,7 +107,7 @@ export default function TaskList({ onEdit, reload }) {
                   />
                 ))
               ) : (
-                <p className="text-gray-500 text-sm">No tasks</p>
+                <p className="text-gray-500 text-sm">{t.noTasks}</p>
               )}
             </div>
           );

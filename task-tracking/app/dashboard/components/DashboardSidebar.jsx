@@ -61,14 +61,6 @@ export default function DashboardSidebar({ collapsed }) {
         />
 
         <DashboardNavItem
-          icon={User}
-          label="Profile"
-          active={pathname.startsWith("/dashboard/profile")}
-          collapsed={collapsed}
-          onClick={() => router.push("/dashboard/profile")}
-        />
-
-        <DashboardNavItem
           icon={Settings}
           label="Settings"
           active={pathname.startsWith("/dashboard/settings")}

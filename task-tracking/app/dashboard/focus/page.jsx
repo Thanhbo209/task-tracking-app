@@ -4,13 +4,18 @@ import PomodoroForm from "@/app/dashboard/focus/components/PomodoroForm";
 import PomodoroCard from "@/app/dashboard/focus/components/PomodoroCard";
 import { apiFetch } from "@/lib/api";
 import TaskItem from "@/app/dashboard/tasks/components/TaskItem";
+import { useLanguage } from "@/context/LanguageContext";
+import { translations } from "@/lib/i18n";
 
 export default function PomodoroPage() {
   const [allPomodoros, setAllPomodoros] = useState([]);
   const [pomodoro, setPomodoro] = useState(null);
+  const { lang } = useLanguage();
+  const t = translations[lang].pomodoro;
   const [loading, setLoading] = useState(true);
   const [openForm, setOpenForm] = useState(false);
   const [tasks, setTasks] = useState([]);
+  const [selectedTask, setSelectedTask] = useState(true);
 
   // Fetch Pomodoro hiện tại
   const fetchCurrent = async () => {
@@ -124,7 +129,7 @@ export default function PomodoroPage() {
     <div className="mx-auto p-4 flex flex-col gap-6">
       {/* Header */}
       <div className="w-full flex justify-between items-center">
-        <h1 className="text-2xl font-bold">🍅 Pomodoro Focus</h1>
+        <h1 className="text-2xl font-bold">{t.title}</h1>
       </div>
 
       {/* Modal Form */}
@@ -139,12 +144,10 @@ export default function PomodoroPage() {
       {/* Current Pomodoro */}
       <div className="w-full flex flex-col items-center gap-4">
         {loading ? (
-          <p className="text-gray-500">Loading...</p>
+          <p className="text-gray-500">{t.loading}</p>
         ) : pomodoro ? (
           <div className="w-full bg-(--accent) shadow-lg rounded-2xl p-6 flex flex-col items-center gap-4">
-            <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">
-              Current Pomodoro
-            </h2>
+            <h2 className="text-2xl font-bold">{t.current}</h2>
 
             <PomodoroCard pomodoro={pomodoro} onEnd={endPomodoro} />
           </div>
@@ -157,7 +160,7 @@ export default function PomodoroPage() {
               +
             </span>
             <p className="mt-2 text-gray-600 dark:text-gray-200">
-              Start New Pomodoro
+              {t.startNew}
             </p>
           </div>
         )}
@@ -169,27 +172,27 @@ export default function PomodoroPage() {
         <div className="w-1/3 flex flex-col gap-4">
           {/* Focused minutes */}
           <div className="bg-(--component) rounded-xl flex-1 p-6 flex  items-center justify-between gap-3 border border-(--border)">
-            <p className="text-xl font-bold text-(--des)">Focused Today</p>
+            <p className="text-xl font-bold">{t.focusedToday}</p>
 
             {/* Circle */}
             <div className=" w-38 h-38 rounded-full border-4 border-green-400 flex items-center justify-center gap-3">
               <span className="text-4xl font-semibold text-(--text)">
                 {todayMinutes}
               </span>
-              <p className="text-sm text-(--des)">minutes</p>
+              <p className="text-sm text-(--des)">{t.minutes}</p>
             </div>
           </div>
 
           {/* Tasks focused */}
           <div className="bg-(--component) rounded-xl flex-1 p-6 flex items-center justify-between gap-3 border border-(--border)">
-            <p className="text-xl font-bold text-(--des)">Tasks Focused</p>
+            <p className="text-xl font-bold">{t.tasksFocused}</p>
 
             {/* Circle */}
             <div className=" w-38 h-38 rounded-full border-4 border-(--accent) flex items-center gap-3 justify-center">
               <span className="text-4xl font-semibold text-(--text)">
                 {todayTaskCount}
               </span>
-              <p className="text-sm text-(--des)">tasks</p>
+              <p className="text-sm text-(--des)">{t.tasks}</p>
             </div>
           </div>
         </div>
@@ -201,7 +204,7 @@ export default function PomodoroPage() {
           {/* Active tasks */}
           <div className="flex flex-col gap-2 max-h-64 ">
             <h3 className="text-xs font-semibold text-(--des) uppercase tracking-wide">
-              Uncompleted Tasks
+              {t.uncompleted}
             </h3>
 
             {activeTasks.length > 0 ? (
@@ -227,7 +230,7 @@ export default function PomodoroPage() {
               ))
             ) : (
               <p className="text-sm text-(--des) text-center py-4">
-                No active tasks
+                {t.noActiveTasks}
               </p>
             )}
           </div>
@@ -236,7 +239,7 @@ export default function PomodoroPage() {
           {doneTasks.length > 0 && (
             <div className="mt-6">
               <h3 className="text-xs font-semibold text-(--des) uppercase tracking-wide mb-2">
-                Completed Tasks
+                {t.completed}
               </h3>
 
               <div className="flex flex-col gap-2">
@@ -255,8 +258,7 @@ export default function PomodoroPage() {
 
           {pomodoro && (
             <p className="text-center text-xs text-(--des) mt-2">
-              You already have an active Pomodoro. Finish it before starting a
-              new one.
+              {t.alreadyActive}
             </p>
           )}
         </div>

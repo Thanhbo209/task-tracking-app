@@ -3,12 +3,18 @@
 import { useEffect, useState } from "react";
 import ActivityHeatmap from "@/app/dashboard/components/ActivityHeatmap";
 import DashboardCard from "@/app/dashboard/components/ui/DashboardCard";
-import { apiFetch } from "@/lib/api";
 import StatCircle from "@/app/dashboard/components/ui/StatCircle";
+import { apiFetch } from "@/lib/api";
+
+import { useLanguage } from "@/context/LanguageContext";
+import { translations } from "@/lib/i18n";
 
 export default function DashboardHome() {
+  const { lang } = useLanguage();
+  const t = translations[lang].dashboard;
+
   const [stats, setStats] = useState(null);
-  const [selectedDate, setSelectedDate] = useState(null); // yyyy-mm-dd
+  const [selectedDate, setSelectedDate] = useState(null);
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -16,6 +22,7 @@ export default function DashboardHome() {
         const url = selectedDate
           ? `/api/dashboard/stats?date=${selectedDate}`
           : "/api/dashboard/stats";
+
         const data = await apiFetch(url);
         setStats(data);
       } catch (err) {
@@ -34,8 +41,8 @@ export default function DashboardHome() {
         <div className="flex-2">
           <DashboardCard
             className="h-full"
-            title="Focus Activity"
-            subtitle="Your focus consistency this year"
+            title={t.focusActivity}
+            subtitle={t.focusSubtitle}
             rightSlot={
               <span className="text-xs text-(--des)">
                 {new Date().getFullYear()}
@@ -45,7 +52,7 @@ export default function DashboardHome() {
             <div className="h-full overflow-x-auto">
               <ActivityHeatmap
                 year={new Date().getFullYear()}
-                onSelectDate={(date) => setSelectedDate(date)}
+                onSelectDate={setSelectedDate}
               />
             </div>
           </DashboardCard>
@@ -56,23 +63,23 @@ export default function DashboardHome() {
           {stats && (
             <>
               <StatCircle
-                label="Focused Time"
+                label={t.focusedTime}
                 value={stats.focusedTodayMinutes}
-                unit="minutes"
+                unit={t.minutes}
                 gradient="from-indigo-500 to-purple-500"
               />
 
               <StatCircle
-                label="Tasks Focused"
+                label={t.tasksFocused}
                 value={stats.tasksFocusedToday}
-                unit="tasks"
-                gradient="from-emerald-500 to-teal-500 "
+                unit={t.tasks}
+                gradient="from-emerald-500 to-teal-500"
               />
 
               <StatCircle
-                label="Focus Streak"
+                label={t.focusStreak}
                 value={stats.focusStreak}
-                unit="days"
+                unit={t.days}
                 gradient="from-yellow-500 to-red-500"
               />
             </>

@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import Task from "../models/Task.js";
 import { markTodayActive } from "./activityController.js";
 
@@ -74,4 +75,72 @@ export const deleteTask = async (req, res) => {
     return res.status(404).json({ message: "Task not found" });
   }
   res.json({ message: "Deleted Succesfully!" });
+};
+
+export const getTaskStats = async (req, res) => {
+  try {
+    const userId = req.user.id; // hoặc req.params.userId
+
+    const stats = await Task.aggregate([
+      {
+        $match: {
+          userId: new mongoose.Types.ObjectId(userId),
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          totalTasks: { $sum: 1 },
+          todoTasks: {
+            $sum: { $cond: [{ $eq: ["$status", "todo"] }, 1, 0] },
+          },
+          doingTasks: {
+            $sum: { $cond: [{ $eq: ["$status", "doing"] }, 1, 0] },
+          },
+          doneTasks: {
+            $sum: { $cond: [{ $eq: ["$status", "done"] }, 1, 0] },
+          },
+        },
+      },
+    ]);
+
+    res.json(
+      stats[0] || {
+        totalTasks: 0,
+        todoTasks: 0,
+        doingTasks: 0,
+        doneTasks: 0,
+      }
+    );
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+export const getOverdueTasks = async (req, res) => {
+  const userId = req.user.id;
+
+  const overdueTasks = await Task.find({
+    userId,
+    status: { $ne: "done" },
+    deadline: { $lt: new Date() },
+  }).sort({ deadline: 1 });
+
+  res.json(overdueTasks);
+};
+
+export const getUpcomingTasks = async (req, res) => {
+  const userId = req.user.id;
+
+  const now = new Date();
+  const threeDaysLater = new Date();
+  threeDaysLater.setDate(now.getDate() + 3);
+
+  const upcomingTasks = await Task.find({
+    userId,
+    status: { $ne: "done" },
+    deadline: { $gte: now, $lte: threeDaysLater },
+  }).sort({ deadline: 1 });
+
+  res.json(upcomingTasks);
 };
